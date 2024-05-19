@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Function Default</title>
+  </head>
+  <body>
+    <script>
+      const arrToStr= (arr = [])=> {
+        return arr.map((i) => i+'');
+      }
+
+      console.log(arrToStr(), arrToStr([1,2,3]))
+    </script>
+  </body>
+</html>
