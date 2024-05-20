@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>v-on:Event</title>
+</head>
+<body>
+<div id="app">
+    <h1>{{num}}</h1>
+    <button v-on:click="addFn">Add</button>
+    <button @click="removeFn">Remove</button>
+</div>
+<script src="./js/vue.js"></script>
+<script>
+    const {ref} = Vue;
+    const App = {
+        setup() {
+            const num = ref(0);
+            const addFn = () => num.value++;
+
+            const removeFn = () => num.value--;
+            return {num, addFn, removeFn};
+        },
+    };
+    Vue.createApp(App).mount("#app");
+</script>
+</body>
+</html>

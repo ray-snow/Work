@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>非同步處理</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: slategray;
+        }
+
+        .box {
+            width: 500px;
+        }
+
+        .box > .btnbox {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .box > .btnbox > a {
+            padding: 10px 10px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .img {
+            border: 8px solid #42b983;
+        }
+
+        .load {
+            width: 40px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="box" v-show="isLoad">
+        <div>
+            <img class="img" alt="" v-for="(item,idx) in imgArr.arr" :key="item.photo" v-show="idx ===imgIdx"
+                 :src="item.photo"/>
+        </div>
+        <div class="btnbox">
+            <a href="javascript:;" @click="remove">上一張</a>
+            <a href="javascript:;" @click="add">下一張</a>
+        </div>
+    </div>
+    <img v-show="!isLoad"  class="load" src="./images/load.gif" alt=""/>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"></script>
+<script src="./js/vue.js"></script>
+<script>
+
+    const {ref, reactive, onMounted} = Vue;
+    const app = {
+        setup() {
+            const imgIdx = ref(0);
+            const imgArr = reactive({arr: []});
+            const isLoad = ref(false);
+
+            onMounted(() => {
+                axios.get('https://vue-lessons-api.vercel.app/courses/list').then((res) => {
+                    // imgArr.arr = res.data;
+                    handImgLoad(res.data)
+                })
+            })
+            const add = () => {
+                imgIdx.value++;
+                if (imgIdx.value >= imgArr.arr.length) {
+                    imgIdx.value = 0;
+                }
+            }
+            const remove = () => {
+                imgIdx.value--;
+                if (imgIdx.value < 0) {
+                    imgIdx.value = imgArr.arr.length - 1;
+                }
+            }
+            const handImgLoad = (data) => {
+                let i = 0;
+                imgArr.arr = data;
+                data.forEach((image) => {
+                    const imgs = new Image();
+                    imgs.src = image.photo;
+                    imgs.onload = () => {
+                        i++;
+                        isLoad.value = i === data.length;
+                    };
+                });
+            };
+
+            return {imgIdx, imgArr, add, remove,isLoad};
+        },
+    };
+    Vue.createApp(app).mount("#app");
+</script>
+</body>
+</html>

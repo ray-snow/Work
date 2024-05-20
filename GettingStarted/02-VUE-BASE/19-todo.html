@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>TODO</title>
+    <link rel="stylesheet" href="./css/19-todo.css"/>
+</head>
+<body>
+<div id="app">
+    <div class="wait">
+        <ul>
+            <li v-for="(item, i) in wait.content"
+                :key="item.idx" @click="handWait(item, i)">
+                <img :src="item.url" alt=""/>
+            </li>
+        </ul>
+    </div>
+    <div class="carried">
+        <ul>
+            <li v-for="(item, i) in over.content"
+                :key="item.idx" @click="handOver(item,i)">
+                <img :src="item.url" alt=""/>
+            </li>
+        </ul>
+    </div>
+    <div :class="['winPage', {open: isWin}]">
+        <h1>闖關成功</h1>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"></script>
+<script src="./js/vue.js"></script>
+<script>
+    const {ref, reactive, onMounted, watch} = Vue;
+    const wait = reactive({content: []});
+    const over = reactive({content: []});
+    const winIdx = ref(0);
+    const isWin = ref(false);
+    const app = {
+        setup() {
+
+            onMounted(() => {
+                axios.get("./api/puzzle.json").then((res) => {
+                    wait.content = res.data;
+                    console.log(res.data)
+                });
+            });
+            const handWait = (item, i) => {
+                over.content.push(item);
+                wait.content.splice(i, 1);
+            };
+            const handOver = (item, i) => {
+                wait.content.push(item);
+                over.content.splice(i, 1);
+            };
+
+            watch(
+                () => over.content,
+                (imgItem) => {
+                    winIdx.value = 0;
+                    imgItem.forEach((item, idx) => {
+                        if (item.idx === idx) {
+                            winIdx.value++;
+                        }
+                    });
+                },
+                {deep: true}
+            );
+
+            watch(winIdx, (i) => {
+                if (i === 9) {
+                    isWin.value = true;
+                }
+            });
+            return {wait, over, handWait, handOver, isWin};
+        },
+    };
+    Vue.createApp(app).mount("#app");
+</script>
+</body>
+</html>

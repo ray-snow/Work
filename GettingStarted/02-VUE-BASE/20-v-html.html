@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>v-html</title>
+    <style>
+      .content {
+        width: 500px;
+        margin: 0 auto;
+      }
+      img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="content" v-html="h"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"></script>
+    <script src="./js/vue.js"></script>
+    <script>
+      const { ref, onMounted } = Vue;
+      const app = {
+        setup() {
+          const h = ref("");
+
+          onMounted(() => {
+            axios.get("https://vue-lessons-api.vercel.app/dom/content").then((res) => {
+              h.value = res.data.html;
+            });
+          });
+          return {h};
+        },
+      };
+
+      Vue.createApp(app).mount("#app");
+    </script>
+  </body>
+</html>
